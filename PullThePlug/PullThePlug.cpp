@@ -49,7 +49,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     }
 
     ULONG32 retNSSPS = NtSetSystemPowerState((POWER_ACTION)PowerSystemShutdown, (SYSTEM_POWER_STATE)PowerActionShutdown, 0);
-    ULONG32 retNSS = NtShutdownSystem(2); //2 = ShutdownPowerOff
+    ULONG32 retNSS = NtShutdownSystem(2); //2 = ShutdownPowerOff; NtShutdownSystem is a fallback
 
     //At this point the PC is shut down if no problems have occurred
     std::cerr << "System didn't shutdown" << std::endl << "NtSetSystemPowerState returned " << retNSSPS << std::endl << "NtShutdownSystem returned " << retNSS << std::endl;

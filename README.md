@@ -11,5 +11,5 @@ I'm not responsable for any loss of data caused by the usage of this program.
 Just open the executable.  
 Precompiled builds support Windows XP and onwards.  
 
-Most of the original work done by (hxhl95)[https://www.codeproject.com/Articles/34194/Performing-emergency-shutdowns], I just reimplemented part of their code.
+Most of the original work done by [hxhl95](https://www.codeproject.com/Articles/34194/Performing-emergency-shutdowns), I just reimplemented part of their code.
 

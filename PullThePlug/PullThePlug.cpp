@@ -4,26 +4,32 @@
 #include <windows.h>
 #include <winternl.h>
 
-
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    typedef ULONG32(WINAPI *lpNSSP)(IN POWER_ACTION SystemAction, IN SYSTEM_POWER_STATE MinSystemState, IN ULONG32 Flags);
+    typedef ULONG32(WINAPI *lpNtShutdownSystem)(int Action);
+    typedef ULONG32(WINAPI *lpNtSetSystemPowerState)(IN POWER_ACTION SystemAction, IN SYSTEM_POWER_STATE MinSystemState, IN ULONG32 Flags);
     HANDLE hToken;
     TOKEN_PRIVILEGES tkp;
     PVOID Info;
     HMODULE hModule;
-    lpNSSP lp_NSSP;
+    lpNtSetSystemPowerState NtSetSystemPowerState;
+    lpNtShutdownSystem NtShutdownSystem;
 
     //Load ntdll.dll
     if ((hModule = LoadLibrary(_T("ntdll.dll"))) == 0) {
         std::cerr << "Error opening ntdll.dll" << std::endl;
-        return 1;
+        return 1;  
     }
 
-    //Get function
-    lp_NSSP = (lpNSSP)GetProcAddress(hModule, "NtSetSystemPowerState");
-    if (lp_NSSP == NULL) {
-        std::cerr << "Error getting NtSetSystemPowerState" << std::endl;
+    //Get functions
+    NtShutdownSystem = (lpNtShutdownSystem)GetProcAddress(hModule, "NtShutdownSystem");
+    if (NtShutdownSystem == NULL) {
+        std::cerr << "Error getting NtShutdownSystem" << std::endl;
         return 2;
+    }
+    NtSetSystemPowerState = (lpNtSetSystemPowerState)GetProcAddress(hModule, "NtSetSystemPowerState");
+    if (NtSetSystemPowerState == NULL) {
+        std::cerr << "Error getting NtSetSystemPowerState" << std::endl;
+        return 3;
     }
 
     // Get a token for this process
@@ -39,12 +45,13 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     AdjustTokenPrivileges(hToken, FALSE, &tkp, 0, (PTOKEN_PRIVILEGES)NULL, 0);
     if (GetLastError() != ERROR_SUCCESS) {
         std::cerr << "Error getting privilege" << std::endl;
-        return 2;
+        return 4;
     }
 
-    ULONG32 ret = lp_NSSP((POWER_ACTION)PowerSystemShutdown, (SYSTEM_POWER_STATE)PowerActionShutdown, 0);
+    ULONG32 retNSSPS = NtSetSystemPowerState((POWER_ACTION)PowerSystemShutdown, (SYSTEM_POWER_STATE)PowerActionShutdown, 0);
+    ULONG32 retNSS = NtShutdownSystem(2); //2 = ShutdownPowerOff
+
     //At this point the PC is shut down if no problems have occurred
-    
-    std::cerr << "System didn't shutdown" << std::endl << "NtSetSystemPowerState returned " << ret << std::endl;
-    return 3;
+    std::cerr << "System didn't shutdown" << std::endl << "NtSetSystemPowerState returned " << retNSSPS << std::endl << "NtShutdownSystem returned " << retNSS << std::endl;
+    return 5;
 }

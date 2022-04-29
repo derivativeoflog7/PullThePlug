@@ -1,5 +1,5 @@
 # PullThePlug
-(Almost) immediately shut off the computer, (almost) like if someone pulled the power plug.  
+(Almost) immediately shut off a Windows computer, (almost) like if someone pulled the power plug.  
 This is accomplished by calling two functions inside NTDLL.DLL that are normally ran at the end of the normal shutdown process, [NtShutdownSystem](http://undocumented.ntinternals.net/index.html?page=UserMode%2FUndocumented%20Functions%2FHardware%2FNtShutdownSystem.html) and NtSetSystemPowerState.  
 
 # Warning!  
